@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     {
       title: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
           notNull: true,
           notEmpty: true
@@ -12,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       author: {
         type: DataTypes.STRING,
+        allowNull: false,
         validate: {
           notNull: true,
           notEmpty: true
