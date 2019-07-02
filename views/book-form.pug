@@ -3,6 +3,7 @@ extends layout.pug
 block content
   form( method="post" action=`/books/${routeExtension}`)
     block message
+    input(type="hidden" name="_method" value=`${crudMethod}`)
     p
       label(for="title") Title
       input(name="title" type="text" id="title" value=`${ book.get("title")}`)

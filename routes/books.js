@@ -30,6 +30,7 @@ router.get("/:id", async (req, res) => {
         title: "Update Book",
         headTitle: books[0].get("title"),
         routeExtension: books[0].get("id"),
+        crudMethod: "PUT",
         submitValue: "Update Book"
       };
       res.render("update-form");
