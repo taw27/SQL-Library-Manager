@@ -42,9 +42,9 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.put("/new", async (req, res) => {
+router.post("/new", async (req, res) => {
   try{
-    
+
   } catch(err){
     console.log(err);
     res.redirect("books/new");
