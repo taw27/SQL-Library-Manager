@@ -1,7 +1,7 @@
 extends layout.pug
 
 block content
-  form( method="post" action=`/books/${book.get("id")}/${crudMethod}`)
+  form( method="post" action=`/books/${book.get("id")}`)
     block message
     p
       label(for="title") Title

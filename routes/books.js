@@ -29,7 +29,6 @@ router.get("/:id", async (req, res) => {
         book: books[0],
         title: "Update Book",
         headTitle: books[0].get("title"),
-        crudMethod: "put",
         submitValue: "Update Book"
       };
       res.render("update-form");
@@ -41,5 +40,19 @@ router.get("/:id", async (req, res) => {
     res.end();
   }
 });
+
+router.put("/new", async (req, res) => {
+  try{
+    
+  } catch(err){
+    console.log(err);
+    res.redirect("books/new");
+  }
+});
+
+router.put("/:id/put", async (req, res) => {
+
+});
+
 
 module.exports = router;
