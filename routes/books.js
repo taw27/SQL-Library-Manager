@@ -98,4 +98,24 @@ router.post("/:id", async (req, res) => {
   }
 });
 
+router.post("/:id/delete", async (req, res) => {
+  try {
+    const book = await Book.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (book) {
+      await book.destroy({force: true});
+      res.redirect("/books");
+    } else {
+      res.redirect("/");
+    }
+  } catch (err) {
+    console.log(err);
+    res.end();
+  }
+});
+
 module.exports = router;
