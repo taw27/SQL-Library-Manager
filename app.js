@@ -25,6 +25,14 @@ app.get("/", (req, res) => {
 
 app.use("/books", booksRouter);
 
+// if route mnot found set error status to 404
+app.use((req, res) => {
+  res.locals.title = "Page Not Found";
+  res.status(404).render("page-not-found");
+});
+
+
+
 sequelize.sync().then(() => {
   app.listen(PORT);
 });
