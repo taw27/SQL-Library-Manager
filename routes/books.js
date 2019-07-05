@@ -51,7 +51,7 @@ router.post("/new", async (req, res) => {
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const book = await Book.findOne({
       where: {
@@ -69,7 +69,7 @@ router.get("/:id", async (req, res) => {
       };
       res.render("update-form");
     } else {
-      res.redirect("/");
+      next();
     }
   } catch (err) {
     console.log(err);
@@ -77,7 +77,7 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/:id", async (req, res) => {
+router.post("/:id", async (req, res, next) => {
   try {
     const book = await Book.findOne({
       where: {
@@ -90,7 +90,7 @@ router.post("/:id", async (req, res) => {
       const updatedBook  = await book.update({ title, author, genre, year });
       res.redirect(`/books/${updatedBook.get("id")}`);
     } else {
-      res.redirect("/");
+      next();
     }
   } catch (err) {
     console.log(err);
@@ -98,7 +98,7 @@ router.post("/:id", async (req, res) => {
   }
 });
 
-router.post("/:id/delete", async (req, res) => {
+router.post("/:id/delete", async (req, res, next) => {
   try {
     const book = await Book.findOne({
       where: {
@@ -110,7 +110,7 @@ router.post("/:id/delete", async (req, res) => {
       await book.destroy({force: true});
       res.redirect("/books");
     } else {
-      res.redirect("/");
+      next();
     }
   } catch (err) {
     console.log(err);
