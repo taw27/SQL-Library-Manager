@@ -12,6 +12,8 @@ A library manager where you can add, update and delete book details.
 
 Technologies used: Node.js, Express.js, Pug templates, SQLite and sequelizejs.
 
+**Note: This project is under progress**
+
 ## Running Instructions
 
 1. Download or clone the repository
