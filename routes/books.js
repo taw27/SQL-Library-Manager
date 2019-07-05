@@ -16,6 +16,41 @@ router.get("/", async (req, res) => {
   }
 });
 
+router.get("/new", async (req, res) => {
+  try {
+    const book = await Book.build({
+      title: "",
+      author: "",
+      genre: "",
+      year: ""
+    });
+    res.locals = {
+      book,
+      title: "New Book",
+      headTitle: "New Book",
+      routeExtension: "new",
+      submitValue: "Create New Book"
+    };
+    res.render("new-form");
+  } catch (err) {
+    console.log(err);
+    res.end();
+  }
+});
+
+router.post("/new", async (req, res) => {
+  try {
+    const { title, author, genre, year } = req.body;
+    const [book] = await Book.findOrCreate({
+      where: { title, author, genre, year }
+    });
+    res.redirect(`/books/${book.get("id")}`);
+  } catch (err) {
+    console.log(err);
+    res.redirect("/books/new");
+  }
+});
+
 router.get("/:id", async (req, res) => {
   try {
     const books = await Book.findAll({
@@ -41,19 +76,5 @@ router.get("/:id", async (req, res) => {
     res.end();
   }
 });
-
-router.post("/new", async (req, res) => {
-  try{
-
-  } catch(err){
-    console.log(err);
-    res.redirect("books/new");
-  }
-});
-
-router.put("/:id/put", async (req, res) => {
-
-});
-
 
 module.exports = router;
