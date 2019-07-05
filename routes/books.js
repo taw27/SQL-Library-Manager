@@ -31,7 +31,7 @@ router.get("/new", async (req, res) => {
       routeExtension: "new",
       submitValue: "Create New Book"
     };
-    res.render("new-form");
+    res.render("new-book");
   } catch (err) {
     console.log(err);
     res.end();
