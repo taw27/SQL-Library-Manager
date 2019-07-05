@@ -53,6 +53,32 @@ router.post("/new", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
+    const book = await Book.findOne({
+      where: {
+        id: req.params.id
+      }
+    });
+
+    if (book) {
+      res.locals = {
+        book: book,
+        title: "Update Book",
+        headTitle: book.get("title"),
+        routeExtension: book.get("id"),
+        submitValue: "Update Book"
+      };
+      res.render("update-form");
+    } else {
+      res.redirect("/");
+    }
+  } catch (err) {
+    console.log(err);
+    res.end();
+  }
+});
+
+router.post("/:id", async (req, res) => {
+  try {
     const books = await Book.findAll({
       where: {
         id: req.params.id
