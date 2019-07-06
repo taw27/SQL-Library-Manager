@@ -1,0 +1,8 @@
+extends book-form.pug
+
+block message
+  if errors
+    h2(class="error") Oooops!
+    ul(class="error")
+      each error in errors
+        li= error.message
