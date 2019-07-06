@@ -93,8 +93,7 @@ router.post("/:id", async (req, res, next) => {
       next();
     }
   } catch (err) {
-    console.log(err);
-    res.end();
+    next(err);
   }
 });
 
@@ -116,6 +115,27 @@ router.post("/:id/delete", async (req, res, next) => {
     console.log(err);
     res.end();
   }
+});
+
+router.use("/:id", async (err, req, res, next) => {
+  if(err.name === "SequelizeValidationError"){
+    const book = await Book.findOne({
+      attributes: ["title", "id"],
+      where: {
+        id: req.params.id
+      }
+    });
+    const { title, author, genre, year } = req.body;
+    res.locals = {
+      book: await Book.build({ id: req.params.id, title, author, genre, year}),
+      title: "Update Book",
+      headTitle: book.get("title"),
+      routeExtension: book.get("id"),
+      submitValue: "Update Book",
+      errors: err.errors
+    };
+  }
+  res.render("update-form");
 });
 
 module.exports = router;
