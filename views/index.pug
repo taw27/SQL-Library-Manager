@@ -4,7 +4,7 @@ block content
   .top-bar
     a(class="button" href="/books/new") Create New Book
     form(action="/books" id="search" method="GET")
-      input(name="query" type="text" placeholder="Search...")
+      input(name="query" type="text" value=`${query}` placeholder="Search...")
       input(type="submit" value="search")
   if(books.length > 0)
     table
