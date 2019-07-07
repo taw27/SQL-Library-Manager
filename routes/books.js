@@ -1,31 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const Book = require("../models").Book;
-const Sequelize = require("../models").Sequelize;
 
 router.get("/", async (req, res, next) => {
   try {
     const booksPerPage = 14;
     const query = req.query.query ? req.query.query : "";
     const numPages = await Book.getNumPages(query, booksPerPage);
-    const activePage = req.query.page ? parseInt(req.query.page) : (numPages === 0 ? 0 : 1);
-    const Op = Sequelize.Op;
+    const activePage = req.query.page? parseInt(req.query.page): (numPages === 0 ? 0: 1);
     if (activePage > numPages || activePage < 0) {
       return next();
     }
-    const books = await Book.findAll({
-      where: {
-        [Op.or]: [
-          { title: { [Op.substring]: query } },
-          { genre: { [Op.substring]: query } },
-          { year: { [Op.substring]: query } },
-          { author: { [Op.substring]: query } }
-        ]
-      },
-      order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]],
-      limit: booksPerPage,
-      offset: (activePage - 1) * booksPerPage
-    });
+    const books = await Book.findByQueryAndPagination(
+      query,
+      booksPerPage,
+      activePage
+    );
     res.locals.books = books;
     res.locals.title = "Books";
     res.locals.pages = numPages;
@@ -39,12 +29,7 @@ router.get("/", async (req, res, next) => {
 
 router.get("/new", async (req, res, next) => {
   try {
-    const book = await Book.build({
-      title: "",
-      author: "",
-      genre: "",
-      year: ""
-    });
+    const book = await Book.buildTempBook();
     res.locals = {
       book,
       title: "New Book",
@@ -72,11 +57,7 @@ router.post("/new", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const book = await Book.findOne({
-      where: {
-        id: req.params.id
-      }
-    });
+    const book = await Book.findById(req.params.id);
 
     if (book) {
       res.locals = {
@@ -97,11 +78,7 @@ router.get("/:id", async (req, res, next) => {
 
 router.post("/:id", async (req, res, next) => {
   try {
-    const book = await Book.findOne({
-      where: {
-        id: req.params.id
-      }
-    });
+    const book = await Book.findById(req.params.id);
 
     if (book) {
       const { title, author, genre, year } = req.body;
@@ -117,11 +94,7 @@ router.post("/:id", async (req, res, next) => {
 
 router.post("/:id/delete", async (req, res, next) => {
   try {
-    const book = await Book.findOne({
-      where: {
-        id: req.params.id
-      }
-    });
+    const book = await Book.findById(req.params.id)
 
     if (book) {
       await book.destroy({ force: true });
@@ -139,13 +112,7 @@ router.use("/new", async (err, req, res, next) => {
     if (err.name === "SequelizeValidationError") {
       const { title, author, genre, year } = req.body;
       res.locals = {
-        book: await Book.build({
-          id: req.params.id,
-          title,
-          author,
-          genre,
-          year
-        }),
+        book: await Book.buildTempBook(req.params.id, title, author, genre, year),
         title: "New Book",
         headTitle: "New Book",
         routeExtension: "new",
@@ -164,21 +131,11 @@ router.use("/new", async (err, req, res, next) => {
 router.use("/:id", async (err, req, res, next) => {
   try {
     if (err.name === "SequelizeValidationError") {
-      const book = await Book.findOne({
-        attributes: ["title", "id"],
-        where: {
-          id: req.params.id
-        }
-      });
+      const book = await Book.findById(req.params.id);
+
       const { title, author, genre, year } = req.body;
       res.locals = {
-        book: await Book.build({
-          id: req.params.id,
-          title,
-          author,
-          genre,
-          year
-        }),
+        book: await Book.buildTempBook(req.params.id, title, author, genre, year),
         title: "Update Book",
         headTitle: book.get("title"),
         routeExtension: book.get("id"),
