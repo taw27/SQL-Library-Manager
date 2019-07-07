@@ -107,3 +107,24 @@ input[type=text] {
 #search input {
   margin-left: 0px;
 }
+
+/* from https://www.w3schools.com/css/tryit.asp?filename=trycss_ex_pagination_active_round  */
+.pagination{
+  margin-top: 5px;
+  display: inline-block;
+}
+
+.pagination a.active {
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 5px;
+}
+
+.pagination a{
+  padding: 8px 16px;
+  text-decoration: none;
+}
+.pagination a:hover:not(.active){
+  background-color: #ddd;
+  border-radius: 5px;
+}

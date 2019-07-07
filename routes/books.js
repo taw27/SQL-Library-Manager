@@ -6,7 +6,12 @@ const Sequelize = require("../models").Sequelize;
 router.get("/", async (req, res, next) => {
   try {
     const query = req.query.query ? req.query.query : "";
+    const numPages = await getNumPages(query, 3);
+    const activePage = req.query.page ? parseInt(req.query.page) : (numPages === 0 ? 0 : 1);
     const Op = Sequelize.Op;
+    if (activePage > numPages || activePage < 0) {
+      return next();
+    }
     const books = await Book.findAll({
       where: {
         [Op.or]: [
@@ -16,14 +21,18 @@ router.get("/", async (req, res, next) => {
           { author: { [Op.substring]: query } }
         ]
       },
-      order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]]
+      order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]],
+      limit: 3,
+      offset: (activePage - 1) * 3
     });
     res.locals.books = books;
     res.locals.title = "Books";
-    res.locals.pages = await getNumPages(query, 3);
+    res.locals.pages = numPages;
+    res.locals.query = query;
+    res.locals.activePage = activePage;
     res.render("index");
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -44,7 +53,7 @@ router.get("/new", async (req, res, next) => {
     };
     res.render("new-book");
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -56,7 +65,7 @@ router.post("/new", async (req, res, next) => {
     });
     res.redirect(`/books/${book.get("id")}`);
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -78,10 +87,10 @@ router.get("/:id", async (req, res, next) => {
       };
       res.render("update-form");
     } else {
-      next();
+      return next();
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -98,10 +107,10 @@ router.post("/:id", async (req, res, next) => {
       const updatedBook = await book.update({ title, author, genre, year });
       res.redirect(`/books/${updatedBook.get("id")}`);
     } else {
-      next();
+      return next();
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -117,10 +126,10 @@ router.post("/:id/delete", async (req, res, next) => {
       await book.destroy({ force: true });
       res.redirect("/books");
     } else {
-      next();
+      return next();
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -144,10 +153,10 @@ router.use("/new", async (err, req, res, next) => {
       };
       res.render("new-book");
     } else {
-      next(err);
+      return next(err);
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
@@ -177,15 +186,15 @@ router.use("/:id", async (err, req, res, next) => {
       };
       res.render("update-form");
     } else {
-      next(err);
+      return next(err);
     }
   } catch (err) {
-    next(err);
+    return next(err);
   }
 });
 
-async function getNumPages(query, perPage){
-  try{
+async function getNumPages(query, perPage) {
+  try {
     const Op = Sequelize.Op;
     const totalRecords = await Book.count({
       where: {
@@ -200,7 +209,7 @@ async function getNumPages(query, perPage){
     });
 
     return Math.ceil(totalRecords / perPage);
-  }catch(err){
+  } catch (err) {
     throw new Error("Error getting pages");
   }
 }
