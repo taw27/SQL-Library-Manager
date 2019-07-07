@@ -7,7 +7,7 @@ router.get("/", async (req, res, next) => {
   try {
     const booksPerPage = 14;
     const query = req.query.query ? req.query.query : "";
-    const numPages = await getNumPages(query, booksPerPage);
+    const numPages = await Book.getNumPages(query, booksPerPage);
     const activePage = req.query.page ? parseInt(req.query.page) : (numPages === 0 ? 0 : 1);
     const Op = Sequelize.Op;
     if (activePage > numPages || activePage < 0) {
@@ -193,26 +193,5 @@ router.use("/:id", async (err, req, res, next) => {
     return next(err);
   }
 });
-
-async function getNumPages(query, perPage) {
-  try {
-    const Op = Sequelize.Op;
-    const totalRecords = await Book.count({
-      where: {
-        [Op.or]: [
-          { title: { [Op.substring]: query } },
-          { genre: { [Op.substring]: query } },
-          { year: { [Op.substring]: query } },
-          { author: { [Op.substring]: query } }
-        ]
-      },
-      order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]]
-    });
-
-    return Math.ceil(totalRecords / perPage);
-  } catch (err) {
-    throw new Error("Error getting pages");
-  }
-}
 
 module.exports = router;
