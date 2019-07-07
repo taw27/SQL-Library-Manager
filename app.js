@@ -31,7 +31,11 @@ app.use((req, res) => {
   res.status(404).render("page-not-found");
 });
 
-
+// render the server error page with the error passed in
+app.use((err, req, res, next) => {
+  res.locals = { title: err.message, error: err, headTitle:"Server Error"};
+  res.status(500).render("server-error");
+});
 
 sequelize.sync().then(() => {
   app.listen(PORT);

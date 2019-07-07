@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const Book = require("../models").Book;
 
-router.get("/", async (req, res) => {
+router.get("/", async (req, res, next) => {
   try {
     const books = await Book.findAll({
       order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]]
@@ -11,12 +11,11 @@ router.get("/", async (req, res) => {
     res.locals.title = "Books";
     res.render("index");
   } catch (err) {
-    console.log(err);
-    res.end();
+    next(err);
   }
 });
 
-router.get("/new", async (req, res) => {
+router.get("/new", async (req, res, next) => {
   try {
     const book = await Book.build({
       title: "",
@@ -33,8 +32,7 @@ router.get("/new", async (req, res) => {
     };
     res.render("new-book");
   } catch (err) {
-    console.log(err);
-    res.end();
+    next(err);
   }
 });
 
@@ -71,8 +69,7 @@ router.get("/:id", async (req, res, next) => {
       next();
     }
   } catch (err) {
-    console.log(err);
-    res.end();
+    next(err);
   }
 });
 
@@ -86,7 +83,7 @@ router.post("/:id", async (req, res, next) => {
 
     if (book) {
       const { title, author, genre, year } = req.body;
-      const updatedBook  = await book.update({ title, author, genre, year });
+      const updatedBook = await book.update({ title, author, genre, year });
       res.redirect(`/books/${updatedBook.get("id")}`);
     } else {
       next();
@@ -105,51 +102,74 @@ router.post("/:id/delete", async (req, res, next) => {
     });
 
     if (book) {
-      await book.destroy({force: true});
+      await book.destroy({ force: true });
       res.redirect("/books");
     } else {
       next();
     }
   } catch (err) {
-    console.log(err);
-    res.end();
+    next(err);
   }
 });
 
 router.use("/new", async (err, req, res, next) => {
-  if(err.name === "SequelizeValidationError"){
-    const { title, author, genre, year } = req.body;
-    res.locals = {
-      book: await Book.build({ id: req.params.id, title, author, genre, year}),
-      title: "New Book",
-      headTitle: "New Book",
-      routeExtension: "new",
-      submitValue: "Create New Book",
-      errors: err.errors
-    };
+  try {
+    if (err.name === "SequelizeValidationError") {
+      const { title, author, genre, year } = req.body;
+      res.locals = {
+        book: await Book.build({
+          id: req.params.id,
+          title,
+          author,
+          genre,
+          year
+        }),
+        title: "New Book",
+        headTitle: "New Book",
+        routeExtension: "new",
+        submitValue: "Create New Book",
+        errors: err.errors
+      };
+      res.render("new-book");
+    } else {
+      next(err);
+    }
+  } catch (err) {
+    next(err);
   }
-  res.render("new-book");
 });
 
 router.use("/:id", async (err, req, res, next) => {
-  if(err.name === "SequelizeValidationError"){
-    const book = await Book.findOne({
-      attributes: ["title", "id"],
-      where: {
-        id: req.params.id
-      }
-    });
-    const { title, author, genre, year } = req.body;
-    res.locals = {
-      book: await Book.build({ id: req.params.id, title, author, genre, year}),
-      title: "Update Book",
-      headTitle: book.get("title"),
-      routeExtension: book.get("id"),
-      submitValue: "Update Book",
-      errors: err.errors
-    };
+  try {
+    if (err.name === "SequelizeValidationError") {
+      const book = await Book.findOne({
+        attributes: ["title", "id"],
+        where: {
+          id: req.params.id
+        }
+      });
+      const { title, author, genre, year } = req.body;
+      res.locals = {
+        book: await Book.build({
+          id: req.params.id,
+          title,
+          author,
+          genre,
+          year
+        }),
+        title: "Update Book",
+        headTitle: book.get("title"),
+        routeExtension: book.get("id"),
+        submitValue: "Update Book",
+        errors: err.errors
+      };
+      res.render("update-form");
+    } else {
+      next(err);
+    }
+  } catch (err) {
+    next(err);
   }
-  res.render("update-form");
 });
 
 module.exports = router;
