@@ -21,4 +21,15 @@ block content
           td= book.get("author")
           td= book.get("genre")
           td= book.get("year")
+          
+  .pagination
+    - let page=1;
+    while page <= pages
+      a(href="#")= page
+      - page += 1;
+
+    
+
+
+
 
