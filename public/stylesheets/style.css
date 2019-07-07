@@ -95,3 +95,8 @@ input[type=text] {
 .error {
   color: rgb(236, 15, 15);
 }
+
+/* Additional styles */
+.top-bar{
+  margin: 20px auto;
+}
