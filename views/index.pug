@@ -6,21 +6,25 @@ block content
     form(action="/books" id="search" method="GET")
       input(name="query" type="text" placeholder="Search...")
       input(type="submit" value="search")
-  table
-    thead
-      tr
-        th Title
-        th Author
-        th Genre
-        th Year
-    tbody
-      each book in books
+  if(books.length > 0)
+    table
+      thead
         tr
-          td
-            a(href=`/books/${book.get("id")}`)= book.get("title")
-          td= book.get("author")
-          td= book.get("genre")
-          td= book.get("year")
+          th Title
+          th Author
+          th Genre
+          th Year
+      tbody
+        each book in books
+          tr
+            td
+              a(href=`/books/${book.get("id")}`)= book.get("title")
+            td= book.get("author")
+            td= book.get("genre")
+            td= book.get("year")
+  else
+    p.no-results No Results <br/>
+      | Please try another query
           
   .pagination
     - let page=1;
