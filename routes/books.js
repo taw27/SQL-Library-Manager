@@ -5,8 +5,9 @@ const Sequelize = require("../models").Sequelize;
 
 router.get("/", async (req, res, next) => {
   try {
+    const booksPerPage = 3;
     const query = req.query.query ? req.query.query : "";
-    const numPages = await getNumPages(query, 3);
+    const numPages = await getNumPages(query, booksPerPage);
     const activePage = req.query.page ? parseInt(req.query.page) : (numPages === 0 ? 0 : 1);
     const Op = Sequelize.Op;
     if (activePage > numPages || activePage < 0) {
@@ -22,8 +23,8 @@ router.get("/", async (req, res, next) => {
         ]
       },
       order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]],
-      limit: 3,
-      offset: (activePage - 1) * 3
+      limit: booksPerPage,
+      offset: (activePage - 1) * booksPerPage
     });
     res.locals.books = books;
     res.locals.title = "Books";
