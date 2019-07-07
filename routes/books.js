@@ -2,6 +2,10 @@ const express = require("express");
 const router = express.Router();
 const Book = require("../models").Book;
 
+/* 
+  Handles get request to /books route, renders the page with all books retreived based on the current
+  page and search query
+ */
 router.get("/", async (req, res, next) => {
   try {
     const booksPerPage = 14;
@@ -27,6 +31,9 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+/* 
+  Handles get requests to /new routes, renders an empty new book form 
+ */
 router.get("/new", async (req, res, next) => {
   try {
     const book = await Book.buildTempBook();
@@ -43,6 +50,9 @@ router.get("/new", async (req, res, next) => {
   }
 });
 
+/* 
+  Handles post requests for new books, creates the book if it does not exist and redirects to book details/update page
+ */
 router.post("/new", async (req, res, next) => {
   try {
     const { title, author, genre, year } = req.body;
@@ -55,6 +65,9 @@ router.post("/new", async (req, res, next) => {
   }
 });
 
+/* 
+  Loads book details based on id parameter and renders the update form if it exists
+ */
 router.get("/:id", async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.id);
@@ -76,6 +89,10 @@ router.get("/:id", async (req, res, next) => {
   }
 });
 
+/* 
+  Updates books based on id parameter if it exists  and reloads the the page with updated details
+  if there are no errors and if the book exists
+ */
 router.post("/:id", async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.id);
@@ -92,6 +109,9 @@ router.post("/:id", async (req, res, next) => {
   }
 });
 
+/*
+  deletes a book based on the id if it exists and redirects to the index page on succes
+ */
 router.post("/:id/delete", async (req, res, next) => {
   try {
     const book = await Book.findById(req.params.id)
@@ -107,6 +127,10 @@ router.post("/:id/delete", async (req, res, next) => {
   }
 });
 
+/* 
+  Handles validation error for new book form or passes on to global error 
+  middle ware if there is no validation error
+ */
 router.use("/new", async (err, req, res, next) => {
   try {
     if (err.name === "SequelizeValidationError") {
@@ -128,6 +152,10 @@ router.use("/new", async (err, req, res, next) => {
   }
 });
 
+/* 
+  Handles validation error for update book form or passes on to global error 
+  middle ware if there is no validation error
+ */
 router.use("/:id", async (err, req, res, next) => {
   try {
     if (err.name === "SequelizeValidationError") {

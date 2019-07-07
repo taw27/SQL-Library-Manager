@@ -1,6 +1,8 @@
 "use strict";
 const Sequelize = require("sequelize");
-
+/* 
+  Book model definition and model methods
+ */
 module.exports = (sequelize, DataTypes) => {
   const Book = sequelize.define(
     "Book",
@@ -42,6 +44,9 @@ module.exports = (sequelize, DataTypes) => {
     // associations can be defined here
   };
 
+  /* 
+    returns the number of pages required based on the query and records per page
+   */
   Book.getNumPages = async function(query, perPage) {
     try {
       const Op = Sequelize.Op;
@@ -63,6 +68,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+  /* 
+    returns all records based on query, the current page, and books per page
+   */
   Book.findByQueryAndPagination = async function(
     query,
     booksPerPage,
@@ -88,6 +96,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   };
 
+  /* 
+    returns record based on id
+   */
   Book.findById = async function(id){
     return await this.findOne({
       where: {
@@ -96,6 +107,10 @@ module.exports = (sequelize, DataTypes) => {
     });
   };
 
+  /* 
+    returns a tempory record instance based on fields passed in. 
+    Will default to empty strings if parameter not passed in
+   */
   Book.buildTempBook = async function(id = "", title ="", author="", genre= "", year=""){
     return await this.build({
       id,
