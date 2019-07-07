@@ -38,7 +38,7 @@ router.get("/new", async (req, res) => {
   }
 });
 
-router.post("/new", async (req, res) => {
+router.post("/new", async (req, res, next) => {
   try {
     const { title, author, genre, year } = req.body;
     const [book] = await Book.findOrCreate({
@@ -46,8 +46,7 @@ router.post("/new", async (req, res) => {
     });
     res.redirect(`/books/${book.get("id")}`);
   } catch (err) {
-    console.log(err);
-    res.redirect("/books/new");
+    next(err);
   }
 });
 
@@ -115,6 +114,21 @@ router.post("/:id/delete", async (req, res, next) => {
     console.log(err);
     res.end();
   }
+});
+
+router.use("/new", async (err, req, res, next) => {
+  if(err.name === "SequelizeValidationError"){
+    const { title, author, genre, year } = req.body;
+    res.locals = {
+      book: await Book.build({ id: req.params.id, title, author, genre, year}),
+      title: "New Book",
+      headTitle: "New Book",
+      routeExtension: "new",
+      submitValue: "Create New Book",
+      errors: err.errors
+    };
+  }
+  res.render("new-book");
 });
 
 router.use("/:id", async (err, req, res, next) => {
