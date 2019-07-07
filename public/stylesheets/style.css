@@ -98,5 +98,12 @@ input[type=text] {
 
 /* Additional styles */
 .top-bar{
-  margin: 20px auto;
+  margin: 20px 0px;
+  width: 737px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#search input {
+  margin-left: 0px;
 }
