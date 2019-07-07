@@ -20,7 +20,7 @@ router.get("/", async (req, res, next) => {
     });
     res.locals.books = books;
     res.locals.title = "Books";
-    res.locals.pages = await getPages(query, 3);
+    res.locals.pages = await getNumPages(query, 3);
     res.render("index");
   } catch (err) {
     next(err);
@@ -184,7 +184,7 @@ router.use("/:id", async (err, req, res, next) => {
   }
 });
 
-async function getPages(query, perPage){
+async function getNumPages(query, perPage){
   try{
     const Op = Sequelize.Op;
     const totalRecords = await Book.count({
