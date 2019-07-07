@@ -5,7 +5,7 @@ const Sequelize = require("../models").Sequelize;
 
 router.get("/", async (req, res, next) => {
   try {
-    const booksPerPage = 3;
+    const booksPerPage = 14;
     const query = req.query.query ? req.query.query : "";
     const numPages = await getNumPages(query, booksPerPage);
     const activePage = req.query.page ? parseInt(req.query.page) : (numPages === 0 ? 0 : 1);
