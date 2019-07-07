@@ -1,10 +1,21 @@
 const express = require("express");
 const router = express.Router();
 const Book = require("../models").Book;
+const Sequelize = require("../models").Sequelize;
 
 router.get("/", async (req, res, next) => {
   try {
+    const query = req.query.query ? req.query.query : "";
+    const Op = Sequelize.Op;
     const books = await Book.findAll({
+      where: {
+        [Op.or]: [
+          { title: { [Op.substring]: query } },
+          { genre: { [Op.substring]: query } },
+          { year: { [Op.substring]: query } },
+          { author: { [Op.substring]: query } }
+        ]
+      },
       order: [["title", "ASC"], ["genre", "ASC"], ["author", "ASC"]]
     });
     res.locals.books = books;
